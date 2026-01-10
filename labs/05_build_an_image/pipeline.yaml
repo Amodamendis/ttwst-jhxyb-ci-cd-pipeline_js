@@ -6,6 +6,9 @@ spec:
   workspaces:
     - name: pipeline-workspace
   params:
+    - name: build-image
+      type: string
+      description: "The name of the image to build"
     - name: repo-url
     - name: branch
       default: master
@@ -60,10 +63,17 @@ spec:
 
     - name: build
       taskRef:
-        name: echo
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
       params:
-      - name: message
-        value: "Building image for $(params.repo-url) ..."
+        - name: IMAGE
+          value: "$(params.build-image)"
+        - name: DOCKERFILE
+          value: "./Dockerfile"
+        - name: CONTEXT
+          value: "./"
       runAfter:
         - tests
 
